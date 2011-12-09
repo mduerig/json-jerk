@@ -7,7 +7,9 @@ import michid.flexjson.JsonValue.Type;
 import michid.flexjson.JsonValue.Visitor;
 import org.junit.Test;
 
+import java.util.HashSet;
 import java.util.Map.Entry;
+import java.util.Set;
 
 public class Examples {
 
@@ -142,5 +144,58 @@ public class Examples {
         });
     }
 
+    @Test
+    public void jsonHandler() {
+        String json = "{\"one\":1,\"two\":{\"three\":3,\"four\":[]}}";
+        final Set<String> atoms = new HashSet<String>();
+        final Set<String> objects = new HashSet<String>();
+        final Set<String> arrays = new HashSet<String>();
+
+        new JsonParser(new JsonHandler(){
+            @Override
+            public void atom(Token key, Token value) {
+                atoms.add(key.text());
+            }
+
+            @Override
+            public void object(JsonParser parser, Token key, JsonTokenizer tokenizer) {
+                objects.add(key.text());
+                super.object(parser, key, tokenizer);
+            }
+
+            @Override
+            public void array(JsonParser parser, Token key, JsonTokenizer tokenizer) {
+                arrays.add(key.text());
+                super.array(parser, key, tokenizer);
+            }
+        }).parseObject(new UnescapingJsonTokenizer(json));
+    }
+
+    @Test
+    public void jsonHandler2() {
+        String json = "{\"one\":1,\"two\":{\"three\":3,\"four\":[]}}";
+        final Set<String> atoms = new HashSet<String>();
+        final Set<String> objects = new HashSet<String>();
+        final Set<String> arrays = new HashSet<String>();
+
+        new JsonParser(new JsonHandler(){
+            @Override
+            public void atom(Token key, Token value) {
+                atoms.add(key.text());
+            }
+
+            @Override
+            public void object(JsonParser parser, Token key, JsonTokenizer tokenizer) {
+                objects.add(key.text());
+                new JsonParser(new JsonHandler()).parseObject(tokenizer);
+            }
+
+            @Override
+            public void array(JsonParser parser, Token key, JsonTokenizer tokenizer) {
+                arrays.add(key.text());
+                new JsonParser(new JsonHandler()).parseArray(tokenizer);
+            }
+        }).parseObject(new UnescapingJsonTokenizer(json));
+    }
 
 }
