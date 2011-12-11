@@ -17,9 +17,9 @@
  * under the License.
  */
 
-package michid.flexjson;
+package michid.jsonjerk;
 
-import michid.flexjson.Token.Type;
+import michid.jsonjerk.Token.Type;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
  * This JSON tokenizer operates on a string as its input. For maximal performance
  * it <em>does not</em> unescape JSON string values.
  * Use {@link JsonValue#unescape(String)} to unescape the text of {@link Token}s
- * of type {@link michid.flexjson.Token.Type#STRING}.
+ * of type {@link michid.jsonjerk.Token.Type#STRING}.
  * 
  * @see UnescapingJsonTokenizer
  */

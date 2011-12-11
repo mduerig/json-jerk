@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package michid.flexjson;
+package michid.jsonjerk;
 
 /**
  * A token represents the smallest lexical unit in a JSON document.

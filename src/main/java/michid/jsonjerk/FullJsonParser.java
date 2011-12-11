@@ -17,18 +17,18 @@
  * under the License.
  */
 
-package michid.flexjson;
+package michid.jsonjerk;
 
-import michid.flexjson.JsonValue.JsonArray;
-import michid.flexjson.JsonValue.JsonAtom;
-import michid.flexjson.JsonValue.JsonObject;
+import michid.jsonjerk.JsonValue.JsonArray;
+import michid.jsonjerk.JsonValue.JsonAtom;
+import michid.jsonjerk.JsonValue.JsonObject;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 /**
  * Utility class for parsing JSON objects and arrays into
- * {@link michid.flexjson.JsonValue.JsonObject}s and {@link michid.flexjson.JsonValue.JsonArray}s, respectively.
+ * {@link michid.jsonjerk.JsonValue.JsonObject}s and {@link michid.jsonjerk.JsonValue.JsonArray}s, respectively.
  *
  * @see LevelOrderJsonParser
  */

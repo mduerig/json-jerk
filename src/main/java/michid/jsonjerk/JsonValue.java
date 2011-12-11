@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package michid.flexjson;
+package michid.jsonjerk;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

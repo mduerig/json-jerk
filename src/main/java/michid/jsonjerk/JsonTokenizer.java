@@ -17,9 +17,9 @@
  * under the License.
  */
 
-package michid.flexjson;
+package michid.jsonjerk;
 
-import michid.flexjson.Token.Type;
+import michid.jsonjerk.Token.Type;
 
 /**
  * Abstract base class for JSON tokenizers.

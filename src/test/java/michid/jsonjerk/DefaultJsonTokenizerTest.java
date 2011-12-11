@@ -17,12 +17,9 @@
  * under the License.
  */
 
-package michid.flexjson;
+package michid.jsonjerk;
 
-import michid.flexjson.DefaultJsonTokenizer;
-import michid.flexjson.JsonTokenizer;
-import michid.flexjson.Token;
-import michid.flexjson.Token.Type;
+import michid.jsonjerk.Token.Type;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package michid.flexjson;
+package michid.jsonjerk;
 
 /**
  * Handler for semantic actions of a {@link JsonParser}.

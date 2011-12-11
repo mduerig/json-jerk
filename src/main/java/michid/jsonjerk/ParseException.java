@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package michid.flexjson;
+package michid.jsonjerk;
 
 /**
  * This exception is thrown when a lexical or a syntax error occurs

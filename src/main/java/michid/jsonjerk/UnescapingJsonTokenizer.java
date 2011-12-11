@@ -17,9 +17,9 @@
  * under the License.
  */
 
-package michid.flexjson;
+package michid.jsonjerk;
 
-import michid.flexjson.Token.Type;
+import michid.jsonjerk.Token.Type;
 
 /**
  * This JSON tokenizer operates on a string as its input. In contrast to

@@ -17,9 +17,9 @@
  * under the License.
  */
 
-package michid.flexjson;
+package michid.jsonjerk;
 
-import michid.flexjson.Token.Type;
+import michid.jsonjerk.Token.Type;
 
 /**
  * A parser for the JSON format accepting the following grammar:

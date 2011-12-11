@@ -17,11 +17,11 @@
  * under the License.
  */
 
-package michid.flexjson;
+package michid.jsonjerk;
 
-import michid.flexjson.JsonValue.JsonArray;
-import michid.flexjson.JsonValue.JsonAtom;
-import michid.flexjson.JsonValue.JsonObject;
+import michid.jsonjerk.JsonValue.JsonArray;
+import michid.jsonjerk.JsonValue.JsonAtom;
+import michid.jsonjerk.JsonValue.JsonObject;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

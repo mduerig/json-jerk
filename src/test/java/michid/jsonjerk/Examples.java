@@ -17,13 +17,13 @@
  * under the License.
  */
 
-package michid.flexjson;
+package michid.jsonjerk;
 
-import michid.flexjson.JsonValue.JsonArray;
-import michid.flexjson.JsonValue.JsonAtom;
-import michid.flexjson.JsonValue.JsonObject;
-import michid.flexjson.JsonValue.Type;
-import michid.flexjson.JsonValue.Visitor;
+import michid.jsonjerk.JsonValue.JsonArray;
+import michid.jsonjerk.JsonValue.JsonAtom;
+import michid.jsonjerk.JsonValue.JsonObject;
+import michid.jsonjerk.JsonValue.Type;
+import michid.jsonjerk.JsonValue.Visitor;
 import org.junit.Test;
 
 import java.util.HashSet;

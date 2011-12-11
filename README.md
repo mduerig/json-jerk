@@ -1,8 +1,8 @@
-Flex Json
+Json Jerk
 =========
-Flex Json is a flexible and fast JSON parser. Flex Json consists of several
-composable parts for tokenizing, (un)escaping, parsing, and handling of semantic actions.
-Furthermore it provides a light weight and type safe object model for JSON documents.
+Json Jerk is a flexible and fast JSON parser. It consists of several composable parts
+for tokenizing, (un)escaping, parsing, and handling of semantic actions. Furthermore
+it provides a light weight and type safe object model for JSON documents.
 
 A simple example
 ----------------
@@ -149,8 +149,8 @@ exactly this: it returns a JSON string.
 Using call backs
 ----------------
 The previous examples all created an object model of `JsonValue`s from a JSON
-string. This is not the only way to parse a JSON document though. With Flex
-Json we can also use an `JsonHandler` to get notified of parse events. Inside
+string. This is not the only way to parse a JSON document though. With Json
+Jerk we can also use an `JsonHandler` to get notified of parse events. Inside
 our `JsonHandler` we can then do whatever we want to handle these events. We
 could for example build a custom object model.
 
@@ -183,8 +183,8 @@ how:
     }).parseObject(new UnescapingJsonTokenizer(json));
 
 The `JsonParser` calls the corresponding call back on the `JsonHandler` whenever
-it parses the respective JSON element. In contrast to other JSON parser, Flex
-Json does not do recursive decent automatically. That is, when it encounters
+it parses the respective JSON element. In contrast to other JSON parser, Json
+Jerk does not do recursive decent automatically. That is, when it encounters
 an object or an array, it will call the corresponding call back of the
 `JsonHandler`. It is then the handlers responsibility to parser the object or
 array itself. The easiest way to do this is to use the `JsonParser` and the
