@@ -45,6 +45,8 @@ import michid.jsonjerk.Token.Type;
  * @see <a href="http://www.json.org/">json.org</a>
  */
 public final class JsonParser {
+    public static final JsonParser SKIP_PARSER = new JsonParser(JsonHandler.INSTANCE);
+
     private final JsonHandler jsonHandler;
 
     public JsonParser(JsonHandler jsonHandler) {

@@ -226,13 +226,13 @@ public class Examples {
             @Override
             public void object(JsonParser parser, Token key, JsonTokenizer tokenizer) {
                 objects.add(key.text());
-                new JsonParser(JsonHandler.INSTANCE).parseObject(tokenizer);
+                JsonParser.SKIP_PARSER.parseObject(tokenizer);
             }
 
             @Override
             public void array(JsonParser parser, Token key, JsonTokenizer tokenizer) {
                 arrays.add(key.text());
-                new JsonParser(JsonHandler.INSTANCE).parseArray(tokenizer);
+                JsonParser.SKIP_PARSER.parseArray(tokenizer);
             }
         }).parseObject(new UnescapingJsonTokenizer(json));
 

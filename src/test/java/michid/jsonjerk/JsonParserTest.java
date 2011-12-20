@@ -129,26 +129,22 @@ public class JsonParserTest {
 
     @Test(expected = ParseException.class)
     public void testParseExceptionValue1() {
-        JsonParser parser = new JsonParser(JsonHandler.INSTANCE);
-        parser.parseObject(new UnescapingJsonTokenizer("{\"key\":}"));
+        JsonParser.SKIP_PARSER.parseObject(new UnescapingJsonTokenizer("{\"key\":}"));
     }
 
     @Test(expected = ParseException.class)
     public void testParseExceptionValue2() {
-        JsonParser parser = new JsonParser(JsonHandler.INSTANCE);
-        parser.parseObject(new UnescapingJsonTokenizer("{\"key\":[1,]}"));
+        JsonParser.SKIP_PARSER.parseObject(new UnescapingJsonTokenizer("{\"key\":[1,]}"));
     }
 
     @Test(expected = ParseException.class)
     public void testParseExceptionPair1() {
-        JsonParser parser = new JsonParser(JsonHandler.INSTANCE);
-        parser.parseObject(new UnescapingJsonTokenizer("{\"key\":1,}"));
+        JsonParser.SKIP_PARSER.parseObject(new UnescapingJsonTokenizer("{\"key\":1,}"));
     }
 
     @Test(expected = ParseException.class)
     public void testParseExceptionPair2() {
-        JsonParser parser = new JsonParser(JsonHandler.INSTANCE);
-        parser.parsePair(new UnescapingJsonTokenizer(""));
+        JsonParser.SKIP_PARSER.parsePair(new UnescapingJsonTokenizer(""));
     }
 
     @Test
