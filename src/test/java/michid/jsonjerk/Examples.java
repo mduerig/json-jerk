@@ -30,12 +30,18 @@ import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class Examples {
 
     @Test
     public void simple() {
         String json = "{\"hello\":\"world\"}";
         JsonObject jsonObject = FullJsonParser.parseObject(new UnescapingJsonTokenizer(json));
+
+        assertEquals(Type.STRING, jsonObject.get("hello").type());
+        assertEquals("world", jsonObject.get("hello").asAtom().value());
     }
 
     @Test
@@ -55,9 +61,12 @@ public class Examples {
                 "\"object\":{}" +
             "}}";
 
-        JsonObject jsonObject = FullJsonParser.parseObject(new UnescapingJsonTokenizer(json));
+        JsonObject jsonObject1 = FullJsonParser.parseObject(new UnescapingJsonTokenizer(json));
         StringBuilder jsonAgain = new StringBuilder();
-        printObject(jsonObject, jsonAgain);
+        printObject(jsonObject1, jsonAgain);
+
+        JsonObject jsonObject2 = FullJsonParser.parseObject(new UnescapingJsonTokenizer(json));
+        assertEquals(jsonObject1, jsonObject2);
     }
 
     private static void printValue(JsonValue jsonValue, StringBuilder sb) {
@@ -122,10 +131,10 @@ public class Examples {
                         "\"object\":{}" +
                         "}}";
 
-        JsonObject jsonObject = FullJsonParser.parseObject(new UnescapingJsonTokenizer(json));
+        JsonObject jsonObject1 = FullJsonParser.parseObject(new UnescapingJsonTokenizer(json));
 
         final StringBuilder sb = new StringBuilder();
-        jsonObject.accept(new Visitor() {
+        jsonObject1.accept(new Visitor() {
             @Override
             public void visit(JsonAtom atom) {
                 if (atom.type() == Type.STRING) {
@@ -161,6 +170,9 @@ public class Examples {
                 sb.append('}');
             }
         });
+
+        JsonObject jsonObject2 = FullJsonParser.parseObject(new UnescapingJsonTokenizer(sb.toString()));
+        assertEquals(jsonObject1, jsonObject2);
     }
 
     @Test
@@ -188,6 +200,14 @@ public class Examples {
                 super.array(parser, key, tokenizer);
             }
         }).parseObject(new UnescapingJsonTokenizer(json));
+
+        assertEquals(2, atoms.size());
+        assertTrue(atoms.contains("one"));
+        assertTrue(atoms.contains("three"));
+        assertEquals(1, objects.size());
+        assertTrue(objects.contains("two"));
+        assertEquals(1, arrays.size());
+        assertTrue(arrays.contains("four"));
     }
 
     @Test
@@ -206,15 +226,21 @@ public class Examples {
             @Override
             public void object(JsonParser parser, Token key, JsonTokenizer tokenizer) {
                 objects.add(key.text());
-                new JsonParser(new JsonHandler()).parseObject(tokenizer);
+                new JsonParser(JsonHandler.INSTANCE).parseObject(tokenizer);
             }
 
             @Override
             public void array(JsonParser parser, Token key, JsonTokenizer tokenizer) {
                 arrays.add(key.text());
-                new JsonParser(new JsonHandler()).parseArray(tokenizer);
+                new JsonParser(JsonHandler.INSTANCE).parseArray(tokenizer);
             }
         }).parseObject(new UnescapingJsonTokenizer(json));
+
+        assertEquals(1, atoms.size());
+        assertTrue(atoms.contains("one"));
+        assertEquals(1, objects.size());
+        assertTrue(objects.contains("two"));
+        assertTrue(arrays.isEmpty());
     }
 
 }
