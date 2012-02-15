@@ -141,8 +141,8 @@ public abstract class JsonValue {
                 default:
                     //Reference: http://www.unicode.org/versions/Unicode5.1.0/
                     if (ch >= '\u0000' && ch <= '\u001F' ||
-                        ch >= '\u007F' && ch <= '\u009F' ||
-                        ch >= '\u2000' && ch <= '\u20FF') {
+                            ch >= '\u007F' && ch <= '\u009F' ||
+                            ch >= '\u2000' && ch <= '\u20FF') {
 
                         String ss = Integer.toHexString(ch);
                         sb.append("\\u");
@@ -229,6 +229,48 @@ public abstract class JsonValue {
     public abstract void accept(Visitor visitor);
 
     /**
+     * @return {@code true} iff {@code this} is an instance of {@code JsonAtom}
+     */
+    public boolean isAtom() {
+        return !type().compound();
+    }
+
+    /**
+     * @return {@code true} iff {@code this} is an instance of {@code JsonArray}
+     */
+    public boolean isArray() {
+        return type() == Type.ARRAY;
+    }
+
+    /**
+     * @return {@code true} iff {@code this} is an instance of {@code JsonObject}
+     */
+    public boolean isObject() {
+        return type() == Type.OBJECT;
+    }
+
+    /**
+     * @return {@code true} iff {@code this} represents a JSON {@code null} value
+     */
+    public boolean isNull() {
+        return this == JsonAtom.NULL || equals(JsonAtom.NULL);
+    }
+
+    /**
+     * @return {@code true} iff {@code this} represents a JSON {@code true} value
+     */
+    public boolean isTrue() {
+        return this == JsonAtom.TRUE || equals(JsonAtom.TRUE);
+    }
+
+    /**
+     * @return {@code true} iff {@code this} represents a JSON {@code false} value
+     */
+    public boolean isFalse() {
+        return this == JsonAtom.FALSE || equals(JsonAtom.FALSE);
+    }
+
+    /**
      * @return {@code this} as {@code JsonAtom}
      * @throws UnsupportedOperationException if {@code this} is not an instance of {@code JsonAtom}
      */
@@ -280,18 +322,18 @@ public abstract class JsonValue {
         public static JsonAtom string(String value) {
             return new JsonAtom(value, Type.STRING);
         }
-        
+
         public static JsonAtom number(double value) {
             if (Double.isNaN(value) || Double.isInfinite(value)) {
                 throw new IllegalArgumentException(Double.toString(value));
             }
             return new JsonAtom(Double.toString(value), Type.NUMBER);
         }
-        
+
         public static JsonAtom number(long value) {
             return new JsonAtom(Long.toString(value), Type.NUMBER);
         }
-        
+
         public static JsonAtom number(BigDecimal value) {
             return new JsonAtom(value.toString(), Type.NUMBER);
         }
@@ -371,7 +413,7 @@ public abstract class JsonValue {
      */
     public static class JsonArray extends JsonValue {
         public static JsonArray EMPTY = new JsonArray(Collections.<JsonValue>emptyList());
-        
+
         private final List<JsonValue> values;
 
         public JsonArray(List<JsonValue> values) {
@@ -544,8 +586,8 @@ public abstract class JsonValue {
 
     private static String toJson(JsonAtom atom) {
         return atom.type() == Type.STRING
-            ? quote(escape(atom.value()))
-            : atom.value();
+                ? quote(escape(atom.value()))
+                : atom.value();
     }
 
     private static String quote(String text) {
