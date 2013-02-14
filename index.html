@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Json-jerk by mduerig</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Json-jerk</h1>
+          <h2>Json Jerk is a flexible and fast JSON parser.</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/mduerig/json-jerk/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/mduerig/json-jerk/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/mduerig/json-jerk" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>Json Jerk</h1>
+
+<p>Json Jerk is a flexible and fast JSON parser. It consists of several composable parts
+for tokenizing, (un)escaping, parsing, and handling of semantic actions. Furthermore
+it provides a light weight and type safe object model for JSON documents.</p>
+
+<h2>A simple example</h2>
+
+<p>The following example shows the simplest way to parse a JSON string:</p>
+
+<pre><code>String json = "{\"hello\":\"world\"}";
+JsonObject jsonObject = FullJsonParser.parseObject(new UnescapingJsonTokenizer(json));
+</code></pre>
+
+<p><code>FullJsonParser</code> is a utility class which provides methods for parsing (parts of) JSON
+documents. Its <code>parseObject</code> method takes a <code>JsonTokenizer</code> as argument and tries to
+parse an object from the input. In this case we've used a <code>UnescapingJsonTokenizer</code>
+instance for the tokenizer. This class unescapes all escape sequences it encounters.
+While this is generally the right thing to do, it can be very expensive in terms of
+performance. If we'd rather want the tokenizer not to unescape, we would use an instance
+of <code>DefaultJsonTokenizer</code>.</p>
+
+<p>If parsing is successful, it results in a <code>JsonObject</code> instance. <code>JsonObject</code> is a
+subclass of <code>JsonValue</code> and represents a JSON object. There is also a <code>JsonArray</code>
+subclass and a <code>JsonAtom</code> subclass which represent JSON arrays and primitive JSON
+values, respectively.</p>
+
+<h2>The object model</h2>
+
+<p>To see how to use the <code>JsonValue</code> classes consider this more complex example:</p>
+
+<pre><code>String json =
+    "{\"string\":\"value\"," +
+    "\"number\":1.42," +
+    "\"null\":null," +
+    "\"false\":false," +
+    "\"true\":true," +
+    "\"nestedArray\":[[],[[],[]]]," +
+    "\"array\":[1,2,3]," +
+    "\"object\":{" +
+        "\"size\":212," +
+        "\"empty\":\"\"," +
+        "\"array\":[1,2,3,{\"number\":142,\"array\":[1,2,3,{}]}]," +
+        "\"object\":{}" +
+    "}}";
+
+JsonObject jsonObject = FullJsonParser.parseObject(new UnescapingJsonTokenizer(json));
+StringBuilder sb = new StringBuilder();
+printObject(jsonObject, sb);
+</code></pre>
+
+<p>The <code>printObject</code> method prints all members of the JSON object by calling <code>printValue</code>
+for each of them. The <code>printValue</code> method in turn determines the actual type of the
+<code>JsonValue</code> and calls one of the respective print methods.</p>
+
+<pre><code>private static void printValue(JsonValue jsonValue, StringBuilder sb) {
+    switch (jsonValue.type()) {
+        case OBJECT:
+            printObject(jsonValue.asObject(), sb);
+            break;
+        case ARRAY:
+            printArray(jsonValue.asArray(), sb);
+            break;
+        default:
+            printAtom(jsonValue.asAtom(), sb);
+    }
+}
+
+private static void printObject(JsonObject object, StringBuilder sb) {
+    sb.append('{');
+    String separator = "";
+    for (Entry&lt;String, JsonValue&gt; pair : object.value().entrySet()) {
+        sb.append(separator);
+        separator = ",";
+        sb.append('"').append(pair.getKey()).append("\":");
+        printValue(pair.getValue(), sb);
+    }
+    sb.append('}');
+}
+
+private static void printArray(JsonArray array, StringBuilder sb) {
+    sb.append('[');
+    String separator = "";
+    for (JsonValue value : array.value()) {
+        sb.append(separator);
+        separator = ",";
+        printValue(value, sb);
+    }
+    sb.append(']');
+}
+
+private static void printAtom(JsonAtom atom, StringBuilder sb) {
+    if (atom.type() == Type.STRING) {
+        sb.append('"').append(JsonValue.escape(atom.value())).append('"');
+    }
+    else {
+        sb.append(atom.value());
+    }
+}
+</code></pre>
+
+<h2>Using a visitor on the object model</h2>
+
+<p>Another way to travers the object model is by implementing a 'JsonValue.Visitor' and
+passing it to the <code>accept</code> method of <code>JsonValue</code>. The following code - as the previous -
+translate the object model back to JSON.</p>
+
+<pre><code>final StringBuilder sb = new StringBuilder();
+jsonObject.accept(new Visitor() {
+    @Override
+    public void visit(JsonAtom atom) {
+        if (atom.type() == Type.STRING) {
+            sb.append('"').append(JsonValue.escape(atom.value())).append('"');
+        }
+        else {
+            sb.append(atom.value());
+        }
+    }
+
+    @Override
+    public void visit(JsonArray array) {
+        sb.append('[');
+        String separator = "";
+        for (JsonValue value : array.value()) {
+            sb.append(separator);
+            separator = ",";
+            value.accept(this);
+        }
+        sb.append(']');
+    }
+
+    @Override
+    public void visit(JsonObject object) {
+        sb.append('{');
+        String separator = "";
+        for (Entry&lt;String, JsonValue&gt; entry : object.value().entrySet()) {
+            sb.append(separator);
+            separator = ",";
+            sb.append('"').append(entry.getKey()).append("\":");
+            entry.getValue().accept(this);
+        }
+        sb.append('}');
+    }
+});
+</code></pre>
+
+<p>Both examples use the <code>escape</code> method of <code>JsonValue</code> for escaping strings.</p>
+
+<p>Although these examples generate JSON from <code>JsonValue</code>, there is no need to
+do this manually in general. In fact, the <code>toJson</code> method of <code>JsonValue</code> does
+exactly this: it returns a JSON string.</p>
+
+<h2>Using call backs</h2>
+
+<p>The previous examples all created an object model of <code>JsonValue</code>s from a JSON
+string. This is not the only way to parse a JSON document though. With Json
+Jerk we can also use an <code>JsonHandler</code> to get notified of parse events. Inside
+our <code>JsonHandler</code> we can then do whatever we want to handle these events. We
+could for example build a custom object model.</p>
+
+<p>Suppose we want to separately collect the keys of all values, object and
+arrays of a JSON document. That is, we want to flat map these keys. Here is
+how:</p>
+
+<pre><code>String json = "{\"one\":1,\"two\":{\"three\":3,\"four\":[]}}";
+final Set&lt;String&gt; atoms = new HashSet&lt;String&gt;();
+final Set&lt;String&gt; objects = new HashSet&lt;String&gt;();
+final Set&lt;String&gt; arrays = new HashSet&lt;String&gt;();
+
+new JsonParser(new JsonHandler(){
+    @Override
+    public void atom(Token key, Token value) {
+        atoms.add(key.text());
+    }
+
+    @Override
+    public void object(JsonParser parser, Token key, JsonTokenizer tokenizer) {
+        objects.add(key.text());
+        super.object(parser, key, tokenizer);
+    }
+
+    @Override
+    public void array(JsonParser parser, Token key, JsonTokenizer tokenizer) {
+        arrays.add(key.text());
+        super.array(parser, key, tokenizer);
+    }
+}).parseObject(new UnescapingJsonTokenizer(json));
+</code></pre>
+
+<p>The <code>JsonParser</code> calls the corresponding call back on the <code>JsonHandler</code> whenever
+it parses the respective JSON element. In contrast to other JSON parser, Json
+Jerk does not do recursive decent automatically. That is, when it encounters
+an object or an array, it will call the corresponding call back of the
+<code>JsonHandler</code>. It is then the handlers responsibility to parser the object or
+array itself. The easiest way to do this is to use the <code>JsonParser</code> and the
+<code>JsonTokenizer</code> passed to the handler. This is exactly what the method's super
+method does. So calling super is actually even easier.</p>
+
+<p>Suppose we want to collect the keys as above but this time we want skip all keys
+from nested structures. To achieve this we need to change the parsing of nested
+structures: instead of calling super which effectively continues parsing with the
+current parser, we need to parse the nested structures with a different parser
+which does nothing but skip the whole structure:</p>
+
+<pre><code>String json = "{\"one\":1,\"two\":{\"three\":3,\"four\":[]}}";
+final Set&lt;String&gt; atoms = new HashSet&lt;String&gt;();
+final Set&lt;String&gt; objects = new HashSet&lt;String&gt;();
+final Set&lt;String&gt; arrays = new HashSet&lt;String&gt;();
+
+new JsonParser(new JsonHandler(){
+    @Override
+    public void atom(Token key, Token value) {
+        atoms.add(key.text());
+    }
+
+    @Override
+    public void object(JsonParser parser, Token key, JsonTokenizer tokenizer) {
+        objects.add(key.text());
+        new JsonParser(new JsonHandler()).parseObject(tokenizer);
+    }
+
+    @Override
+    public void array(JsonParser parser, Token key, JsonTokenizer tokenizer) {
+        arrays.add(key.text());
+        new JsonParser(new JsonHandler()).parseArray(tokenizer);
+    }
+}).parseObject(new UnescapingJsonTokenizer(json));
+</code></pre>
+
+<p>In this example the super calls have been replaced by calls to new parsers which
+have an empty <code>JsonHandler</code> and thus do nothing but skip the current array or
+object.</p>
+
+<p>In more complex scenarios, nested objects and arrays may be parsed with specific
+<code>JsonHandler</code>s. The <code>FullJsonParser</code> used in earlier examples to build the object
+models from JSON documents is implemented in this way: it uses a <code>JsonParser</code> and
+supplied it with different <code>JsonHandler</code> instances to build the hierarchical
+object model consisting of <code>JsonValue</code> objects.</p>
+
+<h2>Be lazy: level order parsing</h2>
+
+<p>Not having the parser to recursively descent on nested structures opens up some
+unexpected possibilities: we don't actually need to parse a nested object on a
+call to <code>JsonHandler.object</code>. What we could do instead, is to keep the state
+of the <code>JsonTokenizer</code> and parse it later when needed.</p>
+
+<p>This is what the <code>LevelOrderJsonParser</code> does. From the outside, this parser look
+the same as the <code>FullJsonParser</code>. In contrast to the latter however, it does not
+parse nested structures right away but rather keeps a reference to a parser for
+them. When a nested structure is accessed through the corresponding <code>JsonValue</code>,
+that parser is invoked to parse the structure. This lazy approach  results in a
+level order traversal of the JSON document compared to the post order traversal
+done by the <code>FullJsonParser</code>. Level order traversal can be beneficial if one
+needs to find all sub objects of a given objects without wanting to cope with
+deeper levels.</p>
+        </section>
+
+        <footer>
+          Json-jerk is maintained by <a href="https://github.com/mduerig">mduerig</a><br>
+          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>
